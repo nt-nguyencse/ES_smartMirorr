@@ -120,6 +120,34 @@ voice.place(relx=.5, rely=.9, anchor="center")
 location=req.get("https://api.ipgeolocation.io/ipgeo?apiKey=28bf9038d7544bf08e24ecd59aa54edd") 
 location_json=json.loads(location.text)
 print(location_json['state_prov'],location_json['district'])
+#Get news from NewYork Times
+#https://api.nytimes.com/svc/news/v3/content/all/all.json?api-key=MMqeWkaAQGaWRIyUW00AxhenUGf9sg8Y
+news=req.get("https://api.nytimes.com/svc/news/v3/content/all/all.json?api-key=MMqeWkaAQGaWRIyUW00AxhenUGf9sg8Y")
+news_json=json.loads(news.text)
+print(news_json['results'][2]['title'])
+
+
+news_show=news_json['results'][0]['title']
+hour_ago = 0
+count =0
+def update_news():
+    global news_show
+    global count 
+    global hour_ago
+    news_= news_json['results'][count]['title']
+    hour_update = news_json['results'][count]['updated_date']
+    str_hour=clock.cget("text")
+    str_hour = str_hour[0:2]
+    hour_ago_ = int(str_hour) - int(hour_update[11:13])
+    if (count < (len(news_json['results'])-1)):
+        count= count+1
+    else:
+        count = 0
+    if (news_show != news_) or (hour_ago != hour_ago_):
+        news_show = news_
+        hour_ago=hour_ago_
+        voice.config(text=news_show +"\n %d" % hour_ago_ + " hours ago" )
+    voice.after(3000,update_news)
 
 #Get weather from OpenWeatherMap
 str="https://samples.openweathermap.org/data/2.5/weather?lat="+str(location_json['latitude'])+"&lon="+str(location_json['longitude'])+"&appid=b6907d289e10d714a6e88b30761fae22"
@@ -128,8 +156,10 @@ print(weather.text)
 weather_json=json.loads(weather.text)
 print (weather_json['main']['temp'])
 temp.configure(text=weather_json['main']['temp'],fg='white',bg='black')
+
 tick()
 day_update()
+update_news()
 update_greeting()
 window.mainloop()
 #
