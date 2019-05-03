@@ -162,4 +162,5 @@ day_update()
 update_news()
 update_greeting()
 window.mainloop()
-#
+#API IBM Watson: cLR5aTlONiYrcGTq_On_5n3oDBh9Kw79sZQ42aFowOjz
+#https://gateway-wdc.watsonplatform.net/speech-to-text/api
