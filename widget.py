@@ -1,4 +1,4 @@
-import tkinter as tk
+import Tkinter as tk
 import socket
 import requests as req
 from random import randint
@@ -33,7 +33,7 @@ def time_format(_minute):
 ####
 window = tk.Tk()
 window.title("Welcome to Smart Mirror")
-window.geometry('1280x720')
+window.geometry('1920x1080')
 window.configure(background='black')
     #Show clock
 clock=tk.Label(window, text='Clock',font=('Arial',30),fg='white',bg='black')
@@ -118,7 +118,7 @@ def update_temp():
         temp.config(text=location_temp+"City\n%d oC"%text)
     temp.after(50000,update_greeting)
 #Voice Regconize State
-voice = tk.Label(window, text="Voice",font=('Arial',20),fg='white',bg='black')
+voice = tk.Label(window, text="Voice",font=('Arial',17),fg='white',bg='black')
 voice.place(relx=.5, rely=.9, anchor="center")
 
 
@@ -140,17 +140,17 @@ print(location_json['state_prov'],location_json['district'])
 #https://api.nytimes.com/svc/news/v3/content/all/all.json?api-key=MMqeWkaAQGaWRIyUW00AxhenUGf9sg8Y
 news=req.get("https://api.nytimes.com/svc/news/v3/content/all/all.json?api-key=MMqeWkaAQGaWRIyUW00AxhenUGf9sg8Y")
 news_json=json.loads(news.text)
-print(news_json['results'][2]['title'])
+print(news_json['results'][1]['abstract'])
+print(news_json['results'][3]['abstract'])
 
-
-news_show=news_json['results'][0]['title']
+news_show=news_json['results'][0]['abstract']
 hour_ago = 0
 count =0
 def update_news():
     global news_show
     global count 
     global hour_ago
-    news_= news_json['results'][count]['title']
+    news_= news_json['results'][count]['abstract']
     hour_update = news_json['results'][count]['updated_date']
     str_hour=clock.cget("text")
     str_hour = str_hour[0:2]
