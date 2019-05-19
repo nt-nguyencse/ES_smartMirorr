@@ -1,75 +1,45 @@
-import requests
+import requests as req
 import json
-import feedparser
 import datetime
 
+class Knowledge:
+    def __init__(self):
+        return
 
-class Knowledge(object):
-    def __init__(self, weather_api_token, news_country_code='us'):
-        self.news_country_code = news_country_code
-        self.weather_api_token = weather_api_token
+    def time_knowledge(self):
+        currentDT = datetime.datetime.now()
+        time_json = {
+            "date":{
+                "year": currentDT.year,
+                "month": currentDT.month,
+                "day": currentDT.day,
+                "hour": currentDT.hour,
+                "minute": currentDT.minute,
+                "second": currentDT.second
+            }
+        }
+        print ("Current date and time : ")
+        #print (now.strftime("%Y-%m-%d %H:%M:%S"))
+        print (currentDT.strftime("%a, %d %b, %Y"))
+        print (currentDT.strftime("%I:%M:%S %p"))
+        str_time = currentDT.strftime("%I:%M:%S %p")
 
-    def find_weather(self):
-        loc_obj = self.get_location()
+        location_json = self.location_knowledge()
+        str_day = location_json['state_prov'] + currentDT.strftime(", %d %b")
+        return time_json, str_time, str_day
 
-        lat = loc_obj['lat']
-        lon = loc_obj['lon']
+    def weather_knowledge(self):
+        location_json = self.location_knowledge()
+        latitude = location_json['latitude']
+        longitude = location_json['longitude']
+        str="https://api.openweathermap.org/data/2.5/weather?appid=0c42f7f6b53b244c78a418f4f181282a&lat="+latitude+"&lon="+longitude
+        weather=req.get(str)
+        weather_json = json.loads(weather.text)
+        print (weather_json['main']['temp'])
+        return weather_json  
 
-        weather_req_url = "https://api.darksky.net/forecast/%s/%s,%s" % (self.weather_api_token, lat, lon)
-        r = requests.get(weather_req_url)
-        weather_json = json.loads(r.text)
-
-        temperature = int(weather_json['currently']['temperature'])
-
-        current_forecast = weather_json['currently']['summary']
-        hourly_forecast = weather_json['minutely']['summary']
-        daily_forecast = weather_json['hourly']['summary']
-        weekly_forecast = weather_json['daily']['summary']
-        icon = weather_json['currently']['icon']
-        wind_speed = int(weather_json['currently']['windSpeed'])
-
-        return {'temperature': temperature, 'icon': icon, 'windSpeed': wind_speed, 'current_forecast': current_forecast, 'hourly_forecast': hourly_forecast, 'daily_forecast': daily_forecast, 'weekly_forecast': weekly_forecast}
-
-    def get_location(self):
-        # get location
-        location_req_url = "http://freegeoip.net/json/%s" % self.get_ip()
-        r = requests.get(location_req_url)
-        location_obj = json.loads(r.text)
-
-        lat = location_obj['latitude']
-        lon = location_obj['longitude']
-
-        return {'lat': lat, 'lon': lon}
-
-    def get_ip(self):
-        ip_url = "http://jsonip.com/"
-        req = requests.get(ip_url)
-        ip_json = json.loads(req.text)
-        return ip_json['ip']
-
-    def get_map_url(self, location, map_type=None):
-        if map_type == "satellite":
-            return "http://maps.googleapis.com/maps/api/staticmap?center=%s&zoom=13&scale=false&size=1200x600&maptype=satellite&format=png" % location
-        elif map_type == "terrain":
-            return "http://maps.googleapis.com/maps/api/staticmap?center=%s&zoom=13&scale=false&size=1200x600&maptype=terrain&format=png" % location
-        elif map_type == "hybrid":
-            return "http://maps.googleapis.com/maps/api/staticmap?center=%s&zoom=13&scale=false&size=1200x600&maptype=hybrid&format=png" % location
-        else:
-            return "http://maps.googleapis.com/maps/api/staticmap?center=%s&zoom=13&scale=false&size=1200x600&maptype=roadmap&format=png" % location
-
-    def get_news(self):
-        ret_headlines = []
-        feed = feedparser.parse("https://news.google.com/news?ned=%s&output=rss" % self.news_country_code)
-
-        for post in feed.entries[0:5]:
-            ret_headlines.append(post.title)
-
-        return ret_headlines
-
-    def get_holidays(self):
-        today = datetime.datetime.now()
-        r = requests.get("http://kayaposoft.com/enrico/json/v1.0/?action=getPublicHolidaysForYear&year=%s&country=usa" % today.year)
-        holidays = json.loads(r.text)
-
-        return holidays
-
+    def location_knowledge(self):
+        location=req.get("https://api.ipgeolocation.io/ipgeo?apiKey=28bf9038d7544bf08e24ecd59aa54edd") 
+        location_json = json.loads(location.text)
+        '''print(location_json['state_prov'],location_json['district'])'''
+        return location_json

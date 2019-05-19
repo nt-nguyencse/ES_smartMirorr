@@ -1,4 +1,3 @@
-
 import tkinter as tk
 import socket
 import requests as req
@@ -6,6 +5,7 @@ from random import randint
 import json
 import datetime
 import time
+from knowledge import Knowledge
 def day_of_week(day_in_week):
     if (day_in_week == 0 ):
         return 'Monday'
@@ -32,15 +32,15 @@ def time_format(_minute):
 ###GUI
 ####
 window = tk.Tk()
-window.title("Welcome to LikeGeeks app")
+window.title("Welcome to Smart Mirror")
 window.geometry('1280x720')
 window.configure(background='black')
     #Show clock
 clock=tk.Label(window, text='Clock',font=('Arial',30),fg='white',bg='black')
 clock.place(relx=0.1,rely=0.2,anchor="center")
     #Show day of week
-dayOfweek=tk.Label(window, text='Day of Week',font=('Arial',20),fg='white',bg='black')
-dayOfweek.place(relx=0.05,rely=0.05,anchor="center")
+'''dayOfweek=tk.Label(window, text='Day of Week',font=('Arial',20),fg='white',bg='black')
+dayOfweek.place(relx=0.05,rely=0.05,anchor="center")'''
     #Show day, month, year
 day=tk.Label(window, text='Day',font=('Arial',15),fg='white',bg='black')
 day.place(relx=0.1,rely=0.12,anchor="center")
@@ -94,13 +94,29 @@ news = tk.Label(window, text="News",font=('Arial',15),fg='white',bg='black')
 news.place(relx=.5, rely=.9, anchor="center")
 
 #Show notification
-notifi = tk.Label(window, text="Notification",font=('Arial',20),fg='white',bg='black')
-notifi.place(relx=.05, rely=.3, anchor="center")
-
+notifi = tk.Label(window, text="Event on Today",font=('Arial',20),fg='white',bg='black')
+notifi.place(relx=.1, rely=.3, anchor="center")
+notifi_ = tk.Label(window, text="No event",font=('Arial',10),fg='white',bg='black')
+notifi_.place(relx=.1, rely=.33, anchor="center")
 #Show Temprature
 temp = tk.Label(window, text="Temp",font=('Arial',30),fg='white',bg='black')
-temp.place(relx=.9, rely=.05, anchor="center")
+temp.place(relx=.85, rely=.09, anchor="center")
 
+temp1=0
+temp_=0
+def update_temp():
+    global temp1
+    global temp_
+    knowledge = Knowledge()
+    weather_json = knowledge.weather_knowledge()
+    location_json = knowledge.location_knowledge()
+    temp_ = weather_json['main']['temp']
+    location_temp=location_json['state_prov']
+    if temp1 != temp_:
+        temp1 = temp_
+        text= int(temp1-273)
+        temp.config(text=location_temp+"City\n%d oC"%text)
+    temp.after(50000,update_greeting)
 #Voice Regconize State
 voice = tk.Label(window, text="Voice",font=('Arial',20),fg='white',bg='black')
 voice.place(relx=.5, rely=.9, anchor="center")
@@ -157,38 +173,11 @@ weather_json=json.loads(weather.text)
 print (weather_json['main']['temp'])
 temp.configure(text=weather_json['main']['temp'],fg='white',bg='black')
 
+
+
 tick()
 day_update()
 update_news()
 update_greeting()
+update_temp()
 window.mainloop()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
